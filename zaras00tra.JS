@@ -52,8 +52,10 @@ class Action {
         }
     }
     richness = () => {
-        let targetCell = game.cells.filter(cell => cell.index == this.targetCellIdx)[0]
-        return targetCell.richness
+        try {
+            let targetCell = game.cells.filter(cell => cell.index == this.targetCellIdx)[0]
+            return targetCell.richness
+        } catch {return null}
     }
     static parse(line) {
         const parts = line.split(" ");
@@ -70,9 +72,9 @@ class Action {
             return `WAIT`;
         }
         if (this.type === SEED) {
-            return `${SEED} ${this.sourceCellIdx} ${this.targetCellIdx}`;
+            return `${SEED} ${this.sourceCellIdx} ${this.targetCellIdx} ${SEED} ${this.sourceCellIdx} ${this.targetCellIdx}`;
         }
-        return `${this.type} ${this.targetCellIdx}`;
+        return `${this.type} ${this.targetCellIdx} ${this.type} ${this.targetCellIdx}`;
     }
 }
 
@@ -100,7 +102,9 @@ class Game {
                 if(b.impact>a.impact) return 1
                 if(b.impact<a.impact) return -1
                 if(b.cost>a.cost) return 1
-                return -1
+                if(b.cost<a.cost) return -1
+                if(b.richness<a.richness) return -1
+                return 1
             });
             console.error("sort : " + this.possibleActions);
             console.error(this.possibleActions);
